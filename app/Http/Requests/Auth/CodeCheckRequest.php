@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CodeCheckRequest extends FormRequest
 {
-    /** 
+    /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
@@ -36,7 +36,7 @@ class CodeCheckRequest extends FormRequest
     public function messages()
     {
         return [
-            'code.exists' => trans('passwords.code_is_invalid')
+            'code.exists' => trans('Kode Reset Password Salah')
         ];
     }
 }

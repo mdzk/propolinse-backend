@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('bank');
             $table->string('image');
 
-            $table->foreign('bayar_id')->references('id')->on('checkouts')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('co_id')->references('id')->on('checkouts')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

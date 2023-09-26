@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->date('tgl_lhr');
+            $table->string('alamat');
             $table->string('gender');
             $table->enum('role', ['admin', 'user']);
             $table->timestamps();

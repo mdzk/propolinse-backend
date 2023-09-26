@@ -13,23 +13,24 @@ class RegisterController extends Controller
 {
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required',
             'nama_akhir' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required',
             'tgl_lhr' => 'required',
             'gender' => 'required',
+            'alamat' => 'required|max:255',
             'confirm_password' => 'required|same:password',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'ada kesalahan!',
-                'data' => $validator->errors()
-            ]);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'ada kesalahan!',
+        //         'data' => $validator->errors()
+        //     ]);
+        // }
 
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);

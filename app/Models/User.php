@@ -23,6 +23,7 @@ class User extends Authenticatable
         'gender',
         'tgl_lhr',
         'email',
+        'alamat',
         'password',
     ];
 

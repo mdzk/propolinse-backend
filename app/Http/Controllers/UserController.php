@@ -15,6 +15,12 @@ class UserController extends Controller
         return new DaftarPelangganResource($user);
     }
 
+    public function getAll()
+    {
+        $user = User::where('role', 'user')->get();
+        return response()->json(['data' => $user]);
+    }
+
     public function getUser(Request $request)
     {
         $user = Auth::user();

@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('admin'),
                 'tgl_lhr' => '2003-11-01',
                 'gender' => 'L',
+                'alamat' => 'Indonesia',
                 'role' => 'admin',
             ],
             [
@@ -31,6 +32,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('user'),
                 'tgl_lhr' => '2002-11-19',
                 'gender' => 'L',
+                'alamat' => 'Indonesia',
                 'role' => 'user',
             ]
         ]);

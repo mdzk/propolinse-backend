@@ -50,7 +50,10 @@ Route::post('password/email',  ForgotPaswordController::class);
 Route::post('password/code/check', CodeCheckController::class);
 Route::post('password/reset', ResetPasswordController::class);
 
-Route::get('/user/{id}', [UserController::class, 'show']);
+// Dapatkan semua data user
+Route::get('/user/all', [UserController::class, 'getAll']);
+// Route::get('/user/{id}', [UserController::class, 'show']);
+// Dapatkan data user berdasarkan token
 Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:sanctum');
 Route::delete('/user/{id}', [UserController::class, 'delete']);
 
