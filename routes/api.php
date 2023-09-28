@@ -60,10 +60,11 @@ Route::delete('/user/{id}', [UserController::class, 'delete']);
 Route::post('/update/prof/{id}', [RegisterController::class, 'update']);
 Route::get('/show/prof/{id}', [RegisterController::class, 'show']);
 
-Route::get('carts/{cart_id}', [CartController::class, 'show'])->middleware(['auth:sanctum']);
-//Route::post('carts/up', [CartController::class, 'addCart'])->middleware(['auth:sanctum']);
-Route::delete('carts/del/{cart_id}', [CartController::class, 'removeFromCart'])->middleware(['auth:sanctum']);
-Route::post('keranjang', [CartController::class, 'keranjang']);
+Route::middleware(['auth:sanctum', 'check.cart.user'])->group(function () {
+    Route::delete('carts/del/{cart_id}', [CartController::class, 'removeFromCart']);
+    Route::post('keranjang', [CartController::class, 'keranjang']);
+    Route::get('carts/{cart_id}', [CartController::class, 'show']);
+});
 
 Route::post('bayar', [PembayaranController::class, 'inputbayar']);
 Route::post('checkout/input', [CheckoutController::class, 'inputcheckout2'])->middleware(['auth:sanctum']);
@@ -71,13 +72,3 @@ Route::post('konfirm/{id}', [PembayaranController::class, 'konfirmasi'])->middle
 Route::get('show', [PembayaranController::class, 'showorder'])->middleware(['auth:sanctum']);
 Route::get('pesanan', [PembayaranController::class, 'jumlahpesanan']);
 Route::get('pembayaran', [PembayaranController::class, 'jumlahpembayaran']);
-
-/*Route::middleware('auth:sanctum')->group(function () {
-
-    Route::prefix('carts')->group(function () {
-        Route::post('/', [CartController::class, 'store']);
-        Route::post('/{product_id}', [CartController::class, 'create']);
-    });
-});*/
-
-//Route::apiResource('carts', 'CartController')->except(['update', 'index']);

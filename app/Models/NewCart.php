@@ -11,7 +11,7 @@ class NewCart extends Model
     use HasFactory;
     protected $table = 'new_carts';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'barang_id', 'quantity', 'sub_total'];
+    protected $fillable = ['id', 'barang_id', 'users_id', 'quantity', 'sub_total'];
 
     public function barang()
     {
@@ -21,5 +21,9 @@ class NewCart extends Model
     public function checkout()
     {
         return $this->belongsTo(Checkout::class, 'checkout_id', 'id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'users_id', 'id');
     }
 }
