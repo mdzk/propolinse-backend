@@ -43,10 +43,10 @@ class CartController extends Controller
     {
         $productId = $request->input('barang_id');
         $quantity = $request->input('quantity');
-        $subtotal = $request->input('sub_total');
         $request['users_id'] = auth()->user()->id;
 
         $product = Barang::find($productId);
+        $subtotal = $product['hrg_brg'] * $quantity;
         if (!$product) {
             return response()->json(['message' => 'Produk tidak ditemukan.'], 404);
         }
@@ -59,7 +59,10 @@ class CartController extends Controller
         $cartItem->sub_total = $subtotal;
         $cartItem->save();
 
-        //$cartItem = NewCart::create($request->all());
+        // Update stok barang
+        $product->stok = $product['stok'] - $quantity;
+        $product->save();
+
         return response()->json([
             'order' => $cartItem,
             'message' => 'Produk Berhasil Ditambahkan kedalam keranjang!',
