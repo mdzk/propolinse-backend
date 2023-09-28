@@ -60,11 +60,11 @@ Route::delete('/user/{id}', [UserController::class, 'delete']);
 Route::post('/update/prof/{id}', [RegisterController::class, 'update']);
 Route::get('/show/prof/{id}', [RegisterController::class, 'show']);
 
-Route::middleware(['auth:sanctum', 'check.cart.user'])->group(function () {
-    Route::delete('carts/del/{cart_id}', [CartController::class, 'removeFromCart']);
-    Route::post('keranjang', [CartController::class, 'keranjang']);
-    Route::get('carts/{cart_id}', [CartController::class, 'show']);
-});
+Route::delete('carts/del/{cart_id}', [CartController::class, 'removeFromCart'])->middleware('auth:sanctum');
+Route::post('keranjang', [CartController::class, 'keranjang'])->middleware('auth:sanctum');
+// Route::get('carts/{cart_id}', [CartController::class, 'show']);
+Route::get('carts/user', [CartController::class, 'getUserCart'])->middleware('auth:sanctum');
+Route::get('carts/user/home', [CartController::class, 'getUserCartHome'])->middleware('auth:sanctum');
 
 Route::post('bayar', [PembayaranController::class, 'inputbayar']);
 Route::post('checkout/input', [CheckoutController::class, 'inputcheckout2'])->middleware(['auth:sanctum']);

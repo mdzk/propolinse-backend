@@ -24,6 +24,24 @@ use App\Models\User;
 
 class CartController extends Controller
 {
+    public function getUserCart()
+    {
+        $cart = NewCart::with('barang')
+            ->where('users_id', auth()->user()->id)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+        return response()->json($cart, 200);
+    }
+
+    public function getUserCartHome()
+    {
+        $cart = NewCart::with('barang')
+            ->where('users_id', auth()->user()->id)
+            ->orderBy('created_at', 'ASC')
+            ->limit(2)
+            ->get();
+        return response()->json($cart, 200);
+    }
     public function show($id)
     {
         $cart = NewCart::find($id);
@@ -41,27 +59,41 @@ class CartController extends Controller
 
     public function keranjang(Request $request)
     {
-        $productId = $request->input('barang_id');
-        $quantity = $request->input('quantity');
-        $request['users_id'] = auth()->user()->id;
+        $validated = $request->validate([
+            'barang_id' => 'required|exists:barang,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $productId = $request->barang_id;
+        $quantity = $request->quantity;
+        $user = auth()->user();
 
         $product = Barang::find($productId);
-        $subtotal = $product['hrg_brg'] * $quantity;
+
         if (!$product) {
             return response()->json(['message' => 'Produk tidak ditemukan.'], 404);
         }
 
-        $subtotal = $product->hrg_brg * $quantity;
+        if ($product->stok < $quantity) {
+            return response()->json(['message' => 'Stok barang tidak mencukupi.'], 400);
+        }
 
-        $cartItem = new NewCart($request->all());
-        $cartItem->barang_id = $productId;
-        $cartItem->quantity = $quantity;
-        $cartItem->sub_total = $subtotal;
-        $cartItem->save();
+        $cartItem = NewCart::where('users_id', $user->id)
+            ->where('barang_id', $productId)
+            ->first();
 
-        // Update stok barang
-        $product->stok = $product['stok'] - $quantity;
-        $product->save();
+        if ($cartItem) {
+            $cartItem->quantity += $quantity;
+            $cartItem->sub_total += ($product->hrg_brg * $quantity);
+            $cartItem->save();
+        } else {
+            $cartItem = NewCart::create([
+                'users_id' => $user->id,
+                'barang_id' => $productId,
+                'quantity' => $quantity,
+                'sub_total' => $product->hrg_brg * $quantity,
+            ]);
+        }
 
         return response()->json([
             'order' => $cartItem,
@@ -69,9 +101,14 @@ class CartController extends Controller
         ], 201);
     }
 
+
+
+
     public function removeFromCart($id)
     {
-        $cartItem = NewCart::find($id);
+        $cartItem = NewCart::where('id', $id)
+            ->where('users_id', auth()->user()->id)
+            ->first();
 
         if (!$cartItem) {
             return response()->json(['message' => 'Item tidak ditemukan dalam keranjang.'], 404);
