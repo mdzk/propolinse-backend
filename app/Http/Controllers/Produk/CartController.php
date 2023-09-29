@@ -37,7 +37,7 @@ class CartController extends Controller
     {
         $cart = NewCart::with('barang')
             ->where('users_id', auth()->user()->id)
-            ->orderBy('created_at', 'ASC')
+            ->orderBy('created_at', 'DESC')
             ->limit(2)
             ->get();
         return response()->json($cart, 200);
