@@ -61,9 +61,9 @@ Route::get('carts/user/home', [CartController::class, 'getUserCartHome'])->middl
 
 Route::post('checkout/input', [CheckoutController::class, 'inputcheckout2'])->middleware(['auth:sanctum']);
 
-Route::post('bayar', [PembayaranController::class, 'inputbayar']);
-Route::post('konfirm/{id}', [PembayaranController::class, 'konfirmasi'])->middleware(['auth:sanctum']);
+Route::post('konfirm/{id}', [PembayaranController::class, 'konfirmasi']);
 Route::get('admin/pesanan', [PembayaranController::class, 'pesanan'])->middleware(['auth:sanctum']);
 Route::get('admin/pembayaran', [PembayaranController::class, 'pembayaran'])->middleware(['auth:sanctum']);
-Route::get('pesanan', [PembayaranController::class, 'jumlahpesanan']);
-Route::get('pembayaran', [PembayaranController::class, 'jumlahpembayaran']);
+Route::get('admin/dashboard', [PembayaranController::class, 'dashboard']);
+// Route::get('pesanan', [PembayaranController::class, 'jumlahpesanan']);
+// Route::get('pembayaran', [PembayaranController::class, 'jumlahpembayaran']);

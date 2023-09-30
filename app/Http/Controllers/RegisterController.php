@@ -60,41 +60,39 @@ class RegisterController extends Controller
 
     public function update(Request $request, $id)
     {
-
         $validated = $request->validate([
             'name' => 'required',
             'nama_akhir' => 'required',
             'email' => 'required|email',
-            'password' => 'required',
             'tgl_lhr' => 'required',
             'gender' => 'required',
-            'confirm_password' => 'required|same:password',
+            'password' => 'sometimes|required_with:confirm_password|same:confirm_password',
+            'confirm_password' => 'sometimes|required_with:password',
         ]);
 
-
-        //$this->authorize('update', $barang);
         $post = User::find($id);
 
+        $updates = [
+            'name' => $request->name,
+            'nama_akhir' => $request->nama_akhir,
+            'email' => $request->email,
+            'tgl_lhr' => $request->tgl_lhr,
+            'gender' => $request->gender,
+        ];
 
-        //update post with new image
-        $post->update([
-            'name'     => $request->name,
-            'nama_akhir'     => $request->nama_akhir,
-            'email'     => $request->email,
-            'password'     => $request->password,
-            'tgl_lhr'     => $request->tgl_lhr,
-            'gender'     => $request->gender,
-            'confirm_password'     => $request->confirm_password,
-        ]);
+        if (!empty($request->password)) {
+            $updates['password'] = $request->password;
+        }
 
-
-        //return response
-        //return response($image, Response::HTTP_CREATED);
+        $post->update($updates);
 
         return [
             'message' => 'Berhasil update profil'
         ];
     }
+
+
+
 
     public function logout(Request $request)
     {

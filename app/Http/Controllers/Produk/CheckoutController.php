@@ -12,9 +12,6 @@ class CheckoutController extends Controller
 {
     public function inputcheckout2(Request $request)
     {
-        // return response()->json([
-        //     'data' => $request->all(),
-        // ], 201);
         $validated = $request->validate([
             'nama' => 'required',
             'alamat' => 'required',
@@ -35,10 +32,6 @@ class CheckoutController extends Controller
         $bank = $request->input('bank');
         $image = $request->file('image');
 
-        $totalBayar = NewCart::whereIn('id', $productIds)->sum('sub_total');
-
-        $totalBayar += $ongkir;
-
         foreach ($productIds as $productId) {
             $cartItem = new Checkout();
             $cartItem->newcart_id = $productId;
@@ -52,7 +45,9 @@ class CheckoutController extends Controller
             $image->storeAs('public/posts', $image->hashName());
             $cartItem->image = $image->hashName();
 
-            $cartItem->total_bayar = $totalBayar;
+            // Mengambil sub_total dari produk yang dibeli dan menambahkannya dengan ongkir
+            $product = NewCart::find($productId);
+            $cartItem->total_bayar = $product->sub_total + $ongkir;
 
             $cartItem->save();
         }

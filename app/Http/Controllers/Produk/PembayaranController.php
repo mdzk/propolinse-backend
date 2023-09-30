@@ -10,6 +10,7 @@ use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,10 +18,6 @@ class PembayaranController extends Controller
 {
     public function konfirmasi(Request $request, $cartId)
     {
-        $validated = $request->validate([
-            'konfirm' => 'required',
-        ]);
-
         if (Konfirmasi::where('bayar_id', $cartId)->exists()) {
             return response()->json([
                 'success' => false,
@@ -29,7 +26,7 @@ class PembayaranController extends Controller
         }
 
         $konfir = Konfirmasi::create([
-            'konfirm' => $request->konfirm,
+            'konfirm' => 'confirmed',
             'bayar_id' => $cartId
         ]);
 
@@ -45,7 +42,20 @@ class PembayaranController extends Controller
         $data = Checkout::leftJoin('konfirmasi', 'checkouts.id', '=', 'konfirmasi.bayar_id')
             ->join('new_carts', 'checkouts.newcart_id', '=', 'new_carts.id')
             ->join('barang', 'new_carts.barang_id', '=', 'barang.id')
-            ->select('checkouts.*', 'new_carts.*', 'konfirmasi.*', 'barang.nm_brg')
+            ->select(
+                'checkouts.id as checkout_id',
+                'checkouts.nama',
+                'checkouts.alamat',
+                'checkouts.kode_pos',
+                'barang.nm_brg',
+                'new_carts.quantity',
+                'new_carts.sub_total',
+                'checkouts.pengiriman',
+                'checkouts.total_bayar',
+                'checkouts.bank',
+                'checkouts.image',
+                'checkouts.created_at'
+            )
             ->whereNull('konfirmasi.id')
             ->get();
 
@@ -87,6 +97,29 @@ class PembayaranController extends Controller
     {
         $jumlah = DB::table('checkouts')->count();
         return response()->json(['Pesanan' => $jumlah]);
+    }
+
+    public function dashboard()
+    {
+        $produk     = Barang::count();
+        $pelanggan     = User::where('role', 'user')->count();
+        $pesanan = Checkout::leftJoin('konfirmasi', 'checkouts.id', '=', 'konfirmasi.bayar_id')
+            ->join('new_carts', 'checkouts.newcart_id', '=', 'new_carts.id')
+            ->join('barang', 'new_carts.barang_id', '=', 'barang.id')
+            ->whereNull('konfirmasi.id')
+            ->count();
+        $pembayaran = Checkout::join('konfirmasi', 'checkouts.id', '=', 'konfirmasi.bayar_id')
+            ->join('new_carts', 'checkouts.newcart_id', '=', 'new_carts.id')
+            ->join('barang', 'new_carts.barang_id', '=', 'barang.id')
+            ->select('checkouts.*', 'new_carts.*', 'konfirmasi.*', 'barang.nm_brg')
+            ->count();
+
+        return response()->json([
+            'produk' => $produk,
+            'pesanan' => $pesanan,
+            'pembayaran' => $pembayaran,
+            'pelanggan' => $pelanggan
+        ]);
     }
 
     public function jumlahpembayaran()

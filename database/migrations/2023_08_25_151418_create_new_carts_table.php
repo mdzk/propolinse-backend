@@ -18,7 +18,7 @@ return new class extends Migration
             $table->Integer('quantity');
             $table->Integer('sub_total');
             $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('users_id')->references('id')->on('users');
+            $table->foreign('users_id')->references('id')->on('users')->onDelete(null);
             $table->timestamps();
         });
     }
