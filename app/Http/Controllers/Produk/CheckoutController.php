@@ -33,23 +33,31 @@ class CheckoutController extends Controller
         $image = $request->file('image');
 
         foreach ($productIds as $productId) {
-            $cartItem = new Checkout();
-            $cartItem->newcart_id = $productId;
-            $cartItem->nama = $nama;
-            $cartItem->alamat = $alamat;
-            $cartItem->kode_pos = $kode_pos;
-            $cartItem->pengiriman = $pengiriman;
-            $cartItem->ongkir = $ongkir;
-            $cartItem->bank = $bank;
+            // Ambil data dari keranjang
+            $cartItem = NewCart::find($productId);
+
+            // Buat transaksi baru
+            $checkoutItem = new Checkout();
+            $checkoutItem->newcart_id = $productId;
+            $checkoutItem->nama = $nama;
+            $checkoutItem->alamat = $alamat;
+            $checkoutItem->kode_pos = $kode_pos;
+            $checkoutItem->pengiriman = $pengiriman;
+            $checkoutItem->ongkir = $ongkir;
+            $checkoutItem->bank = $bank;
 
             $image->storeAs('public/posts', $image->hashName());
-            $cartItem->image = $image->hashName();
+            $checkoutItem->image = $image->hashName();
 
             // Mengambil sub_total dari produk yang dibeli dan menambahkannya dengan ongkir
-            $product = NewCart::find($productId);
-            $cartItem->total_bayar = $product->sub_total + $ongkir;
+            $checkoutItem->total_bayar = $cartItem->sub_total + $ongkir;
 
-            $cartItem->save();
+            $checkoutItem->save();
+
+            $product = Barang::find($cartItem->barang_id);
+            $stokBaru = $product->stok - $cartItem->quantity;
+            $product->stok = $stokBaru;
+            $product->save();
         }
 
         return response()->json([

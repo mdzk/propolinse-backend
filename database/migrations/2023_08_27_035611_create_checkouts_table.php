@@ -19,9 +19,9 @@ return new class extends Migration
             $table->Integer('kode_pos');
             $table->string('pengiriman');
             $table->Integer('ongkir');
-            $table->Integer('bank');
-            $table->Integer('image');
-            $table->Integer('total_bayar');
+            $table->string('bank');
+            $table->string('image');
+            $table->string('total_bayar');
             $table->foreign('newcart_id')->references('id')->on('new_carts')->onDelete('cascade')->onUpdate('cascade');
 
             $table->timestamps();
