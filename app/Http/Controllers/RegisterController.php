@@ -24,19 +24,10 @@ class RegisterController extends Controller
             'confirm_password' => 'required|same:password',
         ]);
 
-        // if ($validator->fails()) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'ada kesalahan!',
-        //         'data' => $validator->errors()
-        //     ]);
-        // }
-
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
 
-        //$success['token'] =  $user->createToken('auth_token')->plainTextToken;
         $success['email'] =  $user->email;
 
         return response()->json([

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('bayar_id');
             $table->string('konfirm');
 
-            $table->foreign('bayar_id')->references('id')->on('pembayaran')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('bayar_id')->references('id')->on('checkouts')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

@@ -10,7 +10,7 @@ class Checkout extends Model
     use HasFactory;
     protected $table = 'checkouts';
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'status', 'newcart_id', 'nama', 'alamat', 'kode_pos', 'pengiriman', 'ongkir', 'bank', 'image', 'total_bayar'];
+    protected $fillable = ['id', 'newcart_id', 'nama', 'alamat', 'kode_pos', 'pengiriman', 'ongkir', 'bank', 'image', 'total_bayar'];
 
     public function barang()
     {
@@ -24,5 +24,10 @@ class Checkout extends Model
     public function cart()
     {
         return $this->belongsTo(Pembayaran::class, 'newcart_id', 'id');
+    }
+
+    public function newcart()
+    {
+        return $this->belongsTo(NewCart::class, 'newcart_id');
     }
 }

@@ -20,7 +20,7 @@ class NewCart extends Model
 
     public function checkout()
     {
-        return $this->belongsTo(Checkout::class, 'checkout_id', 'id');
+        return $this->belongsTo(Checkout::class);
     }
     public function user()
     {

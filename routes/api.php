@@ -28,12 +28,8 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 |
 */
 
-/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});*/
-
-//Route::get('/barang', [ControllerBarang::class, 'index']);
-Route::get('/barang', [ControllerBarang::class, 'index']); //->middleware(['auth:sanctum']);
+Route::get('/bestseller', [PembayaranController::class, 'bestseller']);
+Route::get('/barang', [ControllerBarang::class, 'index']);
 Route::get('/barang/{id}', [ControllerBarang::class, 'show']);
 Route::post('/barang', [ControllerBarang::class, 'store'])->middleware(['auth:sanctum']);
 Route::get('/kategori', [ControllerBarang::class, 'kategori']);
@@ -52,23 +48,22 @@ Route::post('password/reset', ResetPasswordController::class);
 
 // Dapatkan semua data user
 Route::get('/user/all', [UserController::class, 'getAll']);
-// Route::get('/user/{id}', [UserController::class, 'show']);
 // Dapatkan data user berdasarkan token
 Route::get('/user', [UserController::class, 'getUser'])->middleware('auth:sanctum');
 Route::delete('/user/{id}', [UserController::class, 'delete']);
 
 Route::post('/update/prof/{id}', [RegisterController::class, 'update']);
-Route::get('/show/prof/{id}', [RegisterController::class, 'show']);
 
 Route::delete('carts/del/{cart_id}', [CartController::class, 'removeFromCart'])->middleware('auth:sanctum');
 Route::post('keranjang', [CartController::class, 'keranjang'])->middleware('auth:sanctum');
-// Route::get('carts/{cart_id}', [CartController::class, 'show']);
 Route::get('carts/user', [CartController::class, 'getUserCart'])->middleware('auth:sanctum');
 Route::get('carts/user/home', [CartController::class, 'getUserCartHome'])->middleware('auth:sanctum');
 
-Route::post('bayar', [PembayaranController::class, 'inputbayar']);
 Route::post('checkout/input', [CheckoutController::class, 'inputcheckout2'])->middleware(['auth:sanctum']);
+
+Route::post('bayar', [PembayaranController::class, 'inputbayar']);
 Route::post('konfirm/{id}', [PembayaranController::class, 'konfirmasi'])->middleware(['auth:sanctum']);
-Route::get('show', [PembayaranController::class, 'showorder'])->middleware(['auth:sanctum']);
+Route::get('admin/pesanan', [PembayaranController::class, 'pesanan'])->middleware(['auth:sanctum']);
+Route::get('admin/pembayaran', [PembayaranController::class, 'pembayaran'])->middleware(['auth:sanctum']);
 Route::get('pesanan', [PembayaranController::class, 'jumlahpesanan']);
 Route::get('pembayaran', [PembayaranController::class, 'jumlahpembayaran']);

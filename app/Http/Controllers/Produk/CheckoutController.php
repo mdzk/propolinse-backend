@@ -18,7 +18,7 @@ class CheckoutController extends Controller
         $validated = $request->validate([
             'nama' => 'required',
             'alamat' => 'required',
-            'kode_pos' => 'nullable',
+            'kode_pos' => 'required',
             'pengiriman' => 'required',
             'ongkir' => 'required',
             'bank' => 'required',
@@ -48,7 +48,6 @@ class CheckoutController extends Controller
             $cartItem->pengiriman = $pengiriman;
             $cartItem->ongkir = $ongkir;
             $cartItem->bank = $bank;
-            $cartItem->status = 'pending';
 
             $image->storeAs('public/posts', $image->hashName());
             $cartItem->image = $image->hashName();

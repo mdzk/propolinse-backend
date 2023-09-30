@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Produk;
 
+use App\Models\Barang;
 use App\Models\NewCart;
 use App\Models\Checkout;
 use App\Models\Konfirmasi;
@@ -14,94 +15,83 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PembayaranController extends Controller
 {
-    /*public function inputbayar(Request $request)
-    {
-        $this->validate($request, [
-            'co_id' => 'required',
-            'nm_pengirim' => 'required',
-            'no_rek' => 'required',
-            'jmlh_transfer' => 'required',
-            'bank' => 'required',
-            'image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-        ]);
-        $image = $request->file('image');
-        $image->storeAs('public/posts', $image->hashName());
-
-        $image = Pembayaran::create([
-            'image'     => $image->hashName(),
-            'nm_pengirim'     => $request->nm_pengirim,
-            'no_rek'     => $request->no_rek,
-            'jmlh_transfer'     => $request->jmlh_transfer,
-            'bank'     => $request->bank,
-            'co_id'     => $request->co_id,
-
-        ]);
-
-
-        //return response($image, Response::HTTP_CREATED);
-
-        return [
-            'message' => 'Pembayaran diproses'
-        ];
-    }*/
-
     public function konfirmasi(Request $request, $cartId)
     {
-
-        $validator = Validator::make($request->all(), [
-            'bayar_id' => 'required',
+        $validated = $request->validate([
             'konfirm' => 'required',
-
         ]);
 
-        if ($validator->fails()) {
+        if (Konfirmasi::where('bayar_id', $cartId)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'ada kesalahan!',
-                'data' => $validator->errors()
-            ]);
+                'message' => 'Data sudah ada',
+            ], 400);
         }
 
-        $input = $request->all();
-        $konfir = Konfirmasi::create($input);
-
-        //$success['token'] =  $user->createToken('auth_token')->plainTextToken;
-        //$success['email'] =  $user->email;
+        $konfir = Konfirmasi::create([
+            'konfirm' => $request->konfirm,
+            'bayar_id' => $cartId
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Lunas',
             'data' => $konfir
-        ]);
+        ], 200);
     }
 
-    public function showorder()
+    public function pesanan()
     {
+        $data = Checkout::leftJoin('konfirmasi', 'checkouts.id', '=', 'konfirmasi.bayar_id')
+            ->join('new_carts', 'checkouts.newcart_id', '=', 'new_carts.id')
+            ->join('barang', 'new_carts.barang_id', '=', 'barang.id')
+            ->select('checkouts.*', 'new_carts.*', 'konfirmasi.*', 'barang.nm_brg')
+            ->whereNull('konfirmasi.id')
+            ->get();
 
-        $data = DB::table('checkouts')
-            ->join('konfirmasi', 'checkouts.id', '=', 'konfirmasi.id')
-            ->join('new_carts', 'checkouts.id', '=', 'new_carts.id')
-            ->join('barang', 'checkouts.id', '=', 'barang.id')
-            //->where('konfirmasi.id', '=', 4) // Kondisi WHERE pada tabel comments
+        return response()->json($data, 200);
+    }
+
+    public function pembayaran()
+    {
+        $data = Checkout::join('konfirmasi', 'checkouts.id', '=', 'konfirmasi.bayar_id')
+            ->join('new_carts', 'checkouts.newcart_id', '=', 'new_carts.id')
+            ->join('barang', 'new_carts.barang_id', '=', 'barang.id')
             ->select('checkouts.*', 'new_carts.*', 'konfirmasi.*', 'barang.nm_brg')
             ->get();
 
-        return response()->json($data, 404);
+        return response()->json($data, 200);
+    }
+
+    public function bestseller()
+    {
+        $joinQuery = Checkout::join('new_carts', 'checkouts.newcart_id', '=', 'new_carts.id')
+            ->join('barang', 'new_carts.barang_id', '=', 'barang.id')
+            ->select('barang.nm_brg', 'barang.hrg_brg', 'barang.id as barang_id', 'barang.image as barang_image');
+
+        $desiredCount = 10;
+
+        $randomData = Barang::inRandomOrder()
+            ->select('nm_brg', 'hrg_brg', 'id as barang_id', 'image as barang_image')
+            ->limit($desiredCount)
+            ->get();
+
+        $data = $joinQuery->get()->concat($randomData);
+
+        $uniqueData = $data->unique('barang_id')->values()->all();
+
+        return response()->json($uniqueData, 200);
     }
 
     public function jumlahpesanan()
     {
-        // Menggunakan Query Builder untuk menghitung jumlah Pesanan
-        $jumlah = DB::table('pembayaran')->count();
-
+        $jumlah = DB::table('checkouts')->count();
         return response()->json(['Pesanan' => $jumlah]);
     }
 
     public function jumlahpembayaran()
     {
-        // Menggunakan Query Builder untuk menghitung jumlah Pembayaran
         $jumlah = DB::table('konfirmasi')->count();
-
         return response()->json(['Konfrimasi' => $jumlah]);
     }
 }
